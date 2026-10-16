@@ -9,12 +9,12 @@ export const useEstimate = () => useContext(Ctx);
 export function EstimateProvider({ children }: { children: ReactNode }) {
   const [isOpen, setOpen] = useState(false);
   const [state, setState] = useState<"idle" | "loading" | "done">("idle");
-  const [err, setErr] = useState<Record<string, string>>({});
+  const [err, setErr] = useState<Partial<Record<"name" | "phone" | "email" | "location", string>>>({});
 
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const d = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
-    const errors: Record<string, string> = {};
+    const d = Object.fromEntries(new FormData(e.currentTarget)) as Partial<Record<"name" | "phone" | "email" | "location", string>>;
+    const errors: Partial<Record<"name" | "phone" | "email" | "location", string>> = {};
     if (!d.name?.trim()) errors.name = "Please enter your name.";
     if ((d.phone ?? "").replace(/\D/g, "").length < 10) errors.phone = "Enter a valid phone number.";
     setErr(errors);
