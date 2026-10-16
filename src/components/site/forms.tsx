@@ -31,7 +31,7 @@ const validPhone = (p: string) => p.replace(/\D/g, "").length >= 10;
 
 export function QuickQuote({ className }: { className?: string }) {
   const { status, fire } = useSubmit();
-  const [err, setErr] = useState<Record<string, string>>({});
+  const [err, setErr] = useState<Partial<Record<"name" | "phone" | "email" | "location", string>>>({});
   if (status === "done") return <div className={cn("surface p-6", className)}><Success text="We'll call you back shortly." /></div>;
   return (
     <form
@@ -39,10 +39,10 @@ export function QuickQuote({ className }: { className?: string }) {
       className={cn("surface grid gap-3 p-5 md:p-6", className)}
       onSubmit={(e) => {
         e.preventDefault();
-        const d = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
-        const x: Record<string, string> = {};
-        if (!d.name.trim()) x.name = "Enter your name.";
-        if (!validPhone(d.phone)) x.phone = "Enter a valid phone.";
+        const d = Object.fromEntries(new FormData(e.currentTarget)) as Partial<Record<"name" | "phone" | "email" | "location", string>>;
+        const x: Partial<Record<"name" | "phone" | "email" | "location", string>> = {};
+        if (!(d.name ?? "").trim()) x.name = "Enter your name.";
+        if (!validPhone(d.phone ?? "")) x.phone = "Enter a valid phone.";
         setErr(x);
         if (!Object.keys(x).length) fire();
       }}
@@ -100,13 +100,13 @@ export function AreaChecker() {
 
 export function ContactForm() {
   const { status, fire } = useSubmit();
-  const [err, setErr] = useState<Record<string, string>>({});
+  const [err, setErr] = useState<Partial<Record<"name" | "phone" | "email" | "location", string>>>({});
   if (status === "done") return <div className="surface p-8"><Success text="Your request is in. We'll reach out within one business day." /></div>;
   const f = (name: string, label: string, props: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
     <label className="grid gap-1.5 text-sm font-medium">
       {label}
-      <input name={name} className="field" aria-invalid={!!err[name]} {...props} />
-      {err[name] && <span className="font-normal text-destructive">{err[name]}</span>}
+      <input name={name} className="field" aria-invalid={!!err[name as "name"]} {...props} />
+      {err[name as "name"] && <span className="font-normal text-destructive">{err[name as "name"]}</span>}
     </label>
   );
   return (
@@ -115,12 +115,12 @@ export function ContactForm() {
       className="surface grid gap-4 p-6 md:p-8"
       onSubmit={(e) => {
         e.preventDefault();
-        const d = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
-        const x: Record<string, string> = {};
-        if (!d.name.trim()) x.name = "Enter your name.";
-        if (!validPhone(d.phone)) x.phone = "Enter a valid phone number.";
+        const d = Object.fromEntries(new FormData(e.currentTarget)) as Partial<Record<"name" | "phone" | "email" | "location", string>>;
+        const x: Partial<Record<"name" | "phone" | "email" | "location", string>> = {};
+        if (!(d.name ?? "").trim()) x.name = "Enter your name.";
+        if (!validPhone(d.phone ?? "")) x.phone = "Enter a valid phone number.";
         if (d.email && !/^\S+@\S+\.\S+$/.test(d.email)) x.email = "Enter a valid email.";
-        if (!d.location.trim()) x.location = "Enter your city or ZIP.";
+        if (!(d.location ?? "").trim()) x.location = "Enter your city or ZIP.";
         setErr(x);
         if (!Object.keys(x).length) fire();
       }}
